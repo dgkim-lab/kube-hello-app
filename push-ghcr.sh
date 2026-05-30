@@ -23,12 +23,14 @@ if [[ -z "${IMAGE_OWNER:-}" ]]; then
 fi
 
 IMAGE_NAME="${IMAGE_NAME:-kube-hello-app}"
-IMAGE_TAG="${IMAGE_TAG:-latest}"
+VERSION="${VERSION:-$(git describe --tags --always --dirty)}"
+DEFAULT_IMAGE_TAG="$(printf "%s" "$VERSION" | sed -E "s/[^A-Za-z0-9_.-]+/-/g; s/^[.-]+//; s/^$/dev/")"
+IMAGE_TAG="${IMAGE_TAG:-$DEFAULT_IMAGE_TAG}"
 IMAGE_URI="ghcr.io/${IMAGE_OWNER}/${IMAGE_NAME}:${IMAGE_TAG}"
 
 echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_USERNAME" --password-stdin
 
-docker build -t "$IMAGE_URI" .
+docker build --build-arg "APP_VERSION=$VERSION" -t "$IMAGE_URI" .
 docker push "$IMAGE_URI"
 
 echo "Pushed ${IMAGE_URI}"
