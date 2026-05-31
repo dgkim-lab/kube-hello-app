@@ -8,6 +8,10 @@ app.get("/", (_req, res) => {
   res.send(`Hello from Express running in Docker! Version: ${version}`);
 });
 
+app.get("/version", (_req, res) => {
+  res.json({ version });
+});
+
 app.listen(port, () => {
   console.log(`Server listening on port ${port} (version: ${version})`);
 });
